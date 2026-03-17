@@ -9,7 +9,7 @@ Usage: python3 save_to_notion.py <article_json_file> <notion_url> <article_url> 
 - read_time: ISO datetime string (default: now, Asia/Shanghai)
 - keywords: comma-separated string (optional)
 - comment: short comment string (optional, posted as page comment)
-- rating: integer 1-5 star rating (optional; 3+ auto-adds "精选" tag)
+- rating: integer 1-5 star rating (optional; 3+ auto-adds "Featured" tag)
 
 Field mapping is auto-detected from the database schema by field type:
   title → article title
@@ -179,11 +179,11 @@ def save(article_path, notion_url, article_url, read_time=None, keywords=None, c
         print('Please ensure your database has Title, URL, and Date fields.', file=sys.stderr)
         sys.exit(1)
 
-    # Auto-add "精选" tag for rating >= 3
+    # Auto-add "Featured" tag for rating >= 3
     if rating and rating >= 3:
         keywords = keywords or []
-        if '精选' not in keywords:
-            keywords.append('精选')
+        if 'Featured' not in keywords:
+            keywords.append('Featured')
 
     if keywords:
         print(f'  Keywords: {", ".join(keywords)}')

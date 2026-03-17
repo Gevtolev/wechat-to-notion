@@ -92,15 +92,15 @@ Based on readability and value, give a star rating:
 - ⭐⭐⭐⭐ (4): good — well-written, actionable, worth bookmarking
 - ⭐⭐⭐⭐⭐ (5): excellent — insightful, well-structured, a must-read in its domain
 
-3 stars and above automatically get a "精选" tag.
+3 stars and above automatically get a "Featured" tag.
 
 **Comment (1 sentence, written in the user's language):**
 Evaluate the article's **readability** and **value**, not summarize its content. Focus on:
 - Is it well-structured and easy to follow, or rambling and padded?
 - Does it deliver actionable insight, or is it surface-level fluff?
 - Who would actually benefit from reading this?
-- Example: "结构清晰，从原理到实操一气呵成，适合想快速上手 MCP 的开发者（难得没有注水）"
-- Example: "标题党，正文大段铺垫到第三屏才进主题，核心观点其实一句话就能说完"
+- Example: "Well-structured, flows from theory to hands-on smoothly — ideal for devs wanting to get started with MCP (refreshingly no filler)"
+- Example: "Clickbait title, buries the lead under three screens of preamble — the core point could fit in a single tweet"
 - Keep it under 35 words. Be direct — praise or criticize with specifics, no hedging.
 
 ### Step 3: Save to Notion
@@ -119,7 +119,7 @@ python3 {skillDir}/scripts/save_to_notion.py \
 - `read_time`: current time in the user's local timezone as ISO 8601 with offset, e.g. `2026-03-12T14:00:00+08:00`
 - `keywords`: comma-separated string
 - `comment`: the single-sentence comment from Step 2
-- `rating`: integer 1–5 (star rating); 3+ automatically adds "精选" to tags
+- `rating`: integer 1–5 (star rating); 3+ automatically adds "Featured" to tags
 
 The script auto-detects field names from the database schema by type (`title`, `url`, `date`, `select`, `multi_select`), writes all content blocks in batches of 100, and posts the comment to the Notion Comments panel.
 

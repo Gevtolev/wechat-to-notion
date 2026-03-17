@@ -1,94 +1,94 @@
 # wechat-to-notion
 
-将微信公众号文章一键保存到 Notion 数据库。自动提取标题、封面、正文内容（段落、标题、图片、代码块、列表），并通过 AI 生成关键词、评论和推荐星级。
+Save WeChat official account articles to a Notion database. Automatically extracts title, cover image, and body content (paragraphs, headings, images, code blocks, lists), then uses AI to generate keywords, a review comment, and a star rating.
 
-## 功能
+## Features
 
-- **文章抓取** — 解析微信公众号 HTML，提取富文本（加粗/斜体）、代码块、列表、图片
-- **智能分析** — AI 自动提取 3-5 个核心关键词，评估可读性与价值，给出 1-5 星推荐评级
-- **精选标签** — 3 星及以上自动打上「精选」标签，方便后续筛选
-- **写入 Notion** — 自动检测数据库字段，分批写入内容 blocks，评论写入评论面板
-- **字段自适应** — 按字段类型（而非名称）匹配，兼容中英文等任意语言的 Notion 数据库
+- **Article Fetching** — Parses WeChat article HTML, extracts rich text (bold/italic), code blocks, lists, and images
+- **Smart Analysis** — AI extracts 3-5 core keywords, evaluates readability and value, assigns a 1-5 star rating
+- **Featured Tag** — Articles rated 3 stars or above are automatically tagged "Featured" for easy filtering
+- **Notion Sync** — Auto-detects database fields, writes content blocks in batches of 100, posts comment to the Comments panel
+- **Field Adaptive** — Matches fields by type (not name), compatible with Notion databases in any language
 
-## 快速开始
+## Quick Start
 
-### 1. 获取 Notion API Key
+### 1. Get a Notion API Key
 
-1. 前往 [My Integrations](https://notion.so/my-integrations) → **+ New integration** → 复制 key（`ntn_` 开头）
-2. 打开目标 Notion 数据库 → **...** → **Connect to** → 选择你的 integration
+1. Go to [My Integrations](https://notion.so/my-integrations) → **+ New integration** → copy the key (starts with `ntn_`)
+2. Open your target Notion database → **...** → **Connect to** → select your integration
 
-### 2. 创建 Notion 数据库
+### 2. Create a Notion Database
 
-数据库需要以下字段（名称可自定义，脚本按类型自动匹配）：
+The database needs the following fields (names can be customized — the script matches by type):
 
-| 字段类型 | 用途 | 示例名称 |
-|---------|------|---------|
-| Title | 文章标题 | 标题 |
-| URL | 文章链接 | 链接 |
-| Date | 阅读时间 | 阅读时间 |
-| Select | 推荐星级 | 推荐 |
-| Multi-select | 关键词标签 | 标签 |
+| Field Type | Purpose | Example Name |
+|-----------|---------|-------------|
+| Title | Article title | Title |
+| URL | Article link | URL |
+| Date | Read time | Read Time |
+| Select | Star rating | Rating |
+| Multi-select | Keyword tags | Tags |
 
-Select 字段建议预设选项：⭐、⭐⭐、⭐⭐⭐、⭐⭐⭐⭐、⭐⭐⭐⭐⭐
+Suggested select options: ⭐, ⭐⭐, ⭐⭐⭐, ⭐⭐⭐⭐, ⭐⭐⭐⭐⭐
 
-### 3. 使用
+### 3. Usage
 
 ```bash
-# 设置 API Key
+# Set API Key
 export NOTION_API_KEY="ntn_xxx"
 
-# 抓取文章
-python3 scripts/fetch_wechat.py <微信文章URL> > /tmp/wx_article.json
+# Fetch article
+python3 scripts/fetch_wechat.py <wechat_article_url> > /tmp/wx_article.json
 
-# 保存到 Notion
+# Save to Notion
 python3 scripts/save_to_notion.py \
   /tmp/wx_article.json \
   <notion_database_url> \
-  <微信文章URL> \
+  <wechat_article_url> \
   "2026-03-17T10:00:00+08:00" \
   "Claude Code,MCP,Agentic Workflow" \
-  "结构清晰，干货密度高，适合想快速上手的开发者" \
+  "Well-structured, solid content density, great for devs wanting a quick start" \
   4
 ```
 
-### 参数说明
+### Parameters
 
-| 参数 | 必填 | 说明 |
-|------|------|------|
-| article_json | ✅ | fetch_wechat.py 的输出文件路径 |
-| notion_url | ✅ | Notion 数据库 URL |
-| article_url | ✅ | 微信文章原始 URL |
-| read_time | ❌ | ISO 8601 时间（默认当前时间） |
-| keywords | ❌ | 逗号分隔的关键词 |
-| comment | ❌ | 一句话评价（写入评论面板） |
-| rating | ❌ | 1-5 星推荐评级（≥3 自动加「精选」标签） |
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| article_json | Yes | Output file path from fetch_wechat.py |
+| notion_url | Yes | Notion database URL |
+| article_url | Yes | Original WeChat article URL |
+| read_time | No | ISO 8601 datetime (defaults to current time) |
+| keywords | No | Comma-separated keywords |
+| comment | No | One-sentence review (posted to Comments panel) |
+| rating | No | 1-5 star rating (>=3 auto-adds "Featured" tag) |
 
-## 设计理念
+## Design
 
-本项目的首要目标是作为 [OpenClaw](https://github.com/nicholasgriffintn/OpenClaw) 的 skill 使用——`SKILL.md` 定义了完整的工作流，OpenClaw 会自动管理环境变量注入和工具链检查。
+This project is primarily built as an [OpenClaw](https://github.com/nicholasgriffintn/OpenClaw) skill — `SKILL.md` defines the complete workflow, and OpenClaw handles environment variable injection and toolchain checks automatically.
 
-但脚本本身不依赖任何 skill 框架，只需要 `python3` 和 `curl`。因此你也可以将它集成到其他 AI agent 平台（Claude Code、Cursor、Windsurf 等），只要 agent 能读取 `SKILL.md` 中的指令并调用 shell 命令即可。
+However, the scripts have zero framework dependencies — they only need `python3` and `curl`. You can integrate them into any AI agent platform (Claude Code, Cursor, Windsurf, etc.) as long as the agent can read instructions from `SKILL.md` and execute shell commands.
 
-### 作为 OpenClaw Skill
+### As an OpenClaw Skill
 
-安装后，在对话中发送微信文章链接即可触发自动化流程：抓取 → AI 分析（关键词 + 评论 + 评级） → 保存到 Notion。
+After installation, simply send a WeChat article link in a conversation to trigger the automated pipeline: fetch → AI analysis (keywords + comment + rating) → save to Notion.
 
 ```bash
 openclaw config set skills.entries.wechat-to-notion.NOTION_API_KEY "ntn_xxx"
 ```
 
-### 作为通用 Agent Skill
+### As a Generic Agent Skill
 
-将本仓库克隆到你的 agent 工作目录，确保 `NOTION_API_KEY` 在环境变量中可用，agent 按照 `SKILL.md` 中的三步流程（fetch → analyze → save）执行即可。无需额外适配。
+Clone this repo into your agent's working directory, ensure `NOTION_API_KEY` is available as an environment variable, and have the agent follow the three-step workflow in `SKILL.md` (fetch → analyze → save). No additional adaptation needed.
 
-## 项目结构
+## Project Structure
 
 ```
-├── SKILL.md                    # OpenClaw skill 定义
+├── SKILL.md                    # OpenClaw skill definition
 ├── README.md
 └── scripts/
-    ├── fetch_wechat.py         # 微信文章抓取与解析
-    └── save_to_notion.py       # Notion 写入（字段检测、分批写入、评论）
+    ├── fetch_wechat.py         # WeChat article fetching and parsing
+    └── save_to_notion.py       # Notion writer (field detection, batch writes, comments)
 ```
 
 ## License
