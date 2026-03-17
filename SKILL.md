@@ -5,7 +5,7 @@ metadata:
   {
     "openclaw": {
       "emoji": "📰",
-      "requires": { "env": ["NOTION_API_KEY"] },
+      "requires": { "env": ["NOTION_API_KEY"], "bin": ["python3", "curl"] },
       "primaryEnv": "NOTION_API_KEY"
     }
   }
@@ -52,6 +52,13 @@ curl -s -X POST https://api.notion.com/v1/databases \
       "Title": {"title": {}},
       "URL": {"url": {}},
       "Read Time": {"date": {}},
+      "Rating": {"select": {"options": [
+        {"name": "⭐", "color": "gray"},
+        {"name": "⭐⭐", "color": "gray"},
+        {"name": "⭐⭐⭐", "color": "yellow"},
+        {"name": "⭐⭐⭐⭐", "color": "orange"},
+        {"name": "⭐⭐⭐⭐⭐", "color": "red"}
+      ]}},
       "Tags": {"multi_select": {}},
       "Notes": {"rich_text": {}}
     }
@@ -73,17 +80,28 @@ python3 {skillDir}/scripts/fetch_wechat.py <wechat_url> > /tmp/wx_article.json
 Use the `read` tool to load `/tmp/wx_article.json`. Read the `title` and text content from `blocks`, then produce two outputs by reasoning directly:
 
 **Keywords (3–5):**
-- Lead with proper nouns: product names, tool names, frameworks, technical terms (e.g. Claude Code, MCP, OpenClaw, RAG)
-- Add domain-specific concepts only when they add meaning (e.g. multi-agent orchestration, agentic workflow)
-- Omit generic filler (e.g. "AI", "efficiency", "productivity", "tools")
+- Only extract core concepts: the specific technologies, products, or domain terms that define what this article is actually about
+- Omit generic/broad terms (e.g. "AI", "efficiency", "productivity", "tools", "development")
 - Comma-separated, preserve original casing
 
+**Rating (1–5 stars):**
+Based on readability and value, give a star rating:
+- ⭐ (1): waste of time — clickbait, no substance, or unreadable
+- ⭐⭐ (2): below average — padded, shallow, or poorly organized
+- ⭐⭐⭐ (3): decent — has useful content but nothing exceptional
+- ⭐⭐⭐⭐ (4): good — well-written, actionable, worth bookmarking
+- ⭐⭐⭐⭐⭐ (5): excellent — insightful, well-structured, a must-read in its domain
+
+3 stars and above automatically get a "精选" tag.
+
 **Comment (1 sentence, written in the user's language):**
-Write a single sentence structured in two parts:
-1. A tight, neutral distillation of the article's core argument — precise enough to serve as a standalone summary quote
-2. A parenthetical editorial aside: a sharp, specific take on the piece — its quality, angle, or the author's intent. Be direct. No hedging.
-- Example: "MCP bridges OpenClaw and Claude Code, eliminating manual context-passing between agents (well-executed tutorial — the headline actually holds up)"
-- Keep it under 35 words
+Evaluate the article's **readability** and **value**, not summarize its content. Focus on:
+- Is it well-structured and easy to follow, or rambling and padded?
+- Does it deliver actionable insight, or is it surface-level fluff?
+- Who would actually benefit from reading this?
+- Example: "结构清晰，从原理到实操一气呵成，适合想快速上手 MCP 的开发者（难得没有注水）"
+- Example: "标题党，正文大段铺垫到第三屏才进主题，核心观点其实一句话就能说完"
+- Keep it under 35 words. Be direct — praise or criticize with specifics, no hedging.
 
 ### Step 3: Save to Notion
 
@@ -94,14 +112,16 @@ python3 {skillDir}/scripts/save_to_notion.py \
   <wechat_url> \
   <read_time_iso8601+08:00> \
   "<kw1>,<kw2>,<kw3>" \
-  "<comment>"
+  "<comment>" \
+  <rating>
 ```
 
 - `read_time`: current time in the user's local timezone as ISO 8601 with offset, e.g. `2026-03-12T14:00:00+08:00`
 - `keywords`: comma-separated string
 - `comment`: the single-sentence comment from Step 2
+- `rating`: integer 1–5 (star rating); 3+ automatically adds "精选" to tags
 
-The script auto-detects field names from the database schema by type (`title`, `url`, `date`, `multi_select`), writes all content blocks in batches of 100, and posts the comment to the Notion Comments panel.
+The script auto-detects field names from the database schema by type (`title`, `url`, `date`, `select`, `multi_select`), writes all content blocks in batches of 100, and posts the comment to the Notion Comments panel.
 
 ## Notes
 
