@@ -1,5 +1,7 @@
 # wechat-to-notion
 
+[中文文档](README.zh-CN.md)
+
 Save WeChat official account articles to a Notion database. Automatically extracts title, cover image, and body content (paragraphs, headings, images, code blocks, lists), then uses AI to generate keywords, a review comment, and a star rating.
 
 ## Features
@@ -85,7 +87,8 @@ Clone this repo into your agent's working directory, ensure `NOTION_API_KEY` is 
 
 ```
 ├── SKILL.md                    # OpenClaw skill definition
-├── README.md
+├── README.md                   # English
+├── README.zh-CN.md             # Chinese
 └── scripts/
     ├── fetch_wechat.py         # WeChat article fetching and parsing
     └── save_to_notion.py       # Notion writer (field detection, batch writes, comments)
