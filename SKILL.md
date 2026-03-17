@@ -30,7 +30,7 @@ echo ${NOTION_API_KEY:0:8}...
 > 2. Open your Notion database → **...** → **Connect to** → select your integration
 > 3. Set the key in your OpenClaw config — **do not paste it into chat**:
 >    ```
->    openclaw config set skills.entries.notion.apiKey "ntn_xxx"
+>    openclaw config set skills.entries.wechat-to-notion.NOTION_API_KEY "ntn_xxx"
 >    ```
 >    OpenClaw will inject it as `NOTION_API_KEY` automatically.
 

@@ -62,6 +62,8 @@ def notion_request(method, path, body=None, key=None):
     if body:
         cmd += ['-d', json.dumps(body)]
     result = subprocess.run(cmd, capture_output=True, text=True)
+    if not result.stdout.strip():
+        return {}
     return json.loads(result.stdout)
 
 
